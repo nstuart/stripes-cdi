@@ -8,6 +8,7 @@ import com.bittheory.stripes.util.QualifierLookup;
 import java.lang.reflect.Constructor;
 import java.util.Set;
 import javax.annotation.Resource;
+import javax.enterprise.context.Dependent;
 import javax.enterprise.context.spi.CreationalContext;
 import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.BeanManager;
