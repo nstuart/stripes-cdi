@@ -8,14 +8,12 @@ import com.bittheory.stripes.util.QualifierLookup;
 import java.lang.reflect.Constructor;
 import java.util.Set;
 import javax.annotation.Resource;
-import javax.enterprise.context.Dependent;
 import javax.enterprise.context.spi.CreationalContext;
+import javax.enterprise.inject.AmbiguousResolutionException;
 import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.inject.Inject;
-import javax.inject.Qualifier;
 import javax.inject.Singleton;
-import javax.naming.InitialContext;
 import net.sourceforge.stripes.config.ConfigurableComponent;
 import net.sourceforge.stripes.config.Configuration;
 import net.sourceforge.stripes.controller.DefaultObjectFactory;
@@ -23,8 +21,22 @@ import net.sourceforge.stripes.controller.ObjectFactory;
 import org.slf4j.Logger;
 
 /**
+ * Allows for the majority of the integration with CDI. Because Stripes relies
+ * on the ObjectFactory for almost all Object creation, as long as items are
+ * funneled through this class everything should be magically 'CDI' integrated.
  *
- * @author nick
+ * <p/>
+ * For default factories and formatters that are included with Stripes, and not
+ * managed, this will fall back to thew regular DefaultObjectFactory to create
+ * new instance of the classes.
+ *
+ * <p/>
+ * <b>NOTE:</b> Because the objects are CDI managed, currently this class with
+ * through an {@link UnsupportedOperationException} on the following methods:
+ * <ul> <li>{@link CdiObjectFactory#newInstance(java.lang.reflect.Constructor, java.lang.Object[])}</li> <li>{@link CdiObjectFactory#newInstance(java.lang.Class, java.lang.Class<?>[], java.lang.Object[])}
+ * </li> </ul>
+ *
+ * @author Nick Stuart
  */
 @Singleton
 public class CdiObjectFactory implements ObjectFactory, ConfigurableComponent {
@@ -41,6 +53,17 @@ public class CdiObjectFactory implements ObjectFactory, ConfigurableComponent {
         defaultObjectFactory.init(configuration);
     }
 
+    /**
+     * Checks the BeanManager first to see if the requested type is a
+     * ManagedBean, otherwise it will fallback to the DefaultObjectFactory for
+     * instantiation.
+     * <p/>
+     * If there is more then one instance of a Bean available, will through a 
+     * {@link AmbiguousResolutionException}.
+     * @param <T>
+     * @param clazz
+     * @return
+     */
     @Override
     public <T> T newInstance(Class<T> clazz) {
         T obj = null;
@@ -54,7 +77,7 @@ public class CdiObjectFactory implements ObjectFactory, ConfigurableComponent {
                         + "Dropping to DefaultObjectFactory", clazz.getCanonicalName());
                 obj = defaultObjectFactory.newInstance(clazz);
             } else if (availableBeans.size() > 1) {
-                throw new RuntimeException("Multiple beans found that could be "
+                throw new AmbiguousResolutionException("Multiple beans found that could be "
                         + "instantiated for the given class [" + clazz.getCanonicalName() + "].");
             } else {
                 Bean<T> beanType = (Bean<T>) availableBeans.iterator().next();

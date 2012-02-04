@@ -13,12 +13,20 @@ import net.sourceforge.stripes.config.RuntimeConfiguration;
 import net.sourceforge.stripes.controller.ObjectFactory;
 
 /**
- * Allows the ObjectFactory instance to be CDI Managed so it can be inject
+ * Allows the ObjectFactory instance to be CDI Managed so it can be injected 
+ * and managed. This class is not managed by CDI itself, but just discovered
+ * by Stripes' normal extension hooks.
  *
- * @author nick
+ * @author Nick Stuart
  */
 public class CdiRuntimeConfiguration extends RuntimeConfiguration {
 
+    /**
+     * Provide our own, CDI managed, ObjectFactory. Almost all Stripes object
+     * creation will flow through this supplied instance, so very little needs
+     * to be done here besides this.
+     * @return 
+     */
     @Override
     protected ObjectFactory initObjectFactory() {
         try {
@@ -33,4 +41,6 @@ public class CdiRuntimeConfiguration extends RuntimeConfiguration {
             throw new RuntimeException(ex);
         }
     }
+    
+    
 }

@@ -10,8 +10,8 @@ import java.util.List;
 import javax.inject.Qualifier;
 
 /**
- *
- * @author nick
+ * Helps find any Qualifier annotations on a given class.
+ * @author Nick Stuart
  */
 public class QualifierLookup {
 

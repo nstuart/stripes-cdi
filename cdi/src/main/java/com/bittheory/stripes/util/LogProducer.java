@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  *
- * @author nick
+ * @author Nick Stuart
  */
 public class LogProducer {
     
