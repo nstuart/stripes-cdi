@@ -31,10 +31,21 @@
             <param-value>Asda423jaZFD234ada#414%^lij!</param-value>
         </init-param>
     </filter>
+    
+    <filter>
+        <filter-name>txFilter</filter-name>
+        <filter-class>com.bittheory.stripes.TransactionalFilter</filter-class>
+    </filter>
 
     <filter-mapping>
         <filter-name>StripesFilter</filter-name>
         <url-pattern>*.jsp</url-pattern>
+        <dispatcher>REQUEST</dispatcher>
+    </filter-mapping>
+    
+    <filter-mapping>
+        <filter-name>txFilter</filter-name>
+        <url-pattern>/*</url-pattern>
         <dispatcher>REQUEST</dispatcher>
     </filter-mapping>
 

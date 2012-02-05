@@ -1,0 +1,117 @@
+
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd
+    http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+        
+    <changeSet id="0" author="Nick Stuart">
+        <createTable tableName="user">
+            <column name="id" autoIncrement="true" type="int">
+                <constraints primaryKey="true"/>
+            </column>
+            
+            <column name="firstName" type="varchar(255)"/>
+            <column name="lastName" type="varchar(255)"/>
+            <column name="userName" type="varchar(255)">
+                <constraints unique="true" nullable="false"/>
+            </column>
+            <column name="email" type="varchar(255)">
+                <constraints unique="true" nullable="false"/>
+            </column>
+        </createTable>
+        <createIndex tableName="user" indexName="user_userName_idx" >
+            <column name="userName"/>
+        </createIndex>
+        <createIndex tableName="user" indexName="user_email_idx" >
+            <column name="email"/>
+        </createIndex>
+        <rollback>
+            <dropTable tableName="user"/>
+        </rollback>
+    </changeSet>
+    
+    <changeSet id="1" author="Nick Stuart">
+        <createTable tableName="project">
+            <column name="id" autoIncrement="true" type="int">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="projectName" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="varchar(1000)"/>
+            <column name="homePage" type="varchar(400)"/>
+        </createTable>
+        <createIndex tableName="project" indexName="project_projectName">
+            <column name="projectName"/>
+        </createIndex>
+    </changeSet>
+    
+    <changeSet id="2" author="Nick Stuart">
+        <createTable tableName="tracker_role">
+            <column name="id" autoIncrement="true" type="int">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="roleName" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet id="3" author="Nick Stuart">
+        <createTable tableName="users_tracker_roles">
+            <column name="id" autoIncrement="true" type="int">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="user_id" type="int">
+                <constraints nullable="false"/>
+            </column>
+            <column name="tracker_role_id" type="int">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet id="4" author="Nick Stuart">
+        <addForeignKeyConstraint baseTableName="users_tracker_roles" 
+                                 baseColumnNames="user_id" constraintName="user_id_role_fk" 
+                                 referencedTableName="user" referencedColumnNames="id"/>
+        <addForeignKeyConstraint baseTableName="users_tracker_roles" 
+                                 baseColumnNames="tracker_role_id" constraintName="role_id_role_fk" 
+                                 referencedTableName="tracker_role" referencedColumnNames="id"/>
+    </changeSet>
+    
+    <changeSet id="5" author="Nick Stuart" runInTransaction="true">
+        <addColumn tableName="user">
+            <column name="createdAt" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updatedAt" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+        <addColumn tableName="project">
+            <column name="createdAt" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updatedAt" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+        <addColumn tableName="tracker_role">
+            <column name="createdAt" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updatedAt" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    
+    <changeSet id="6" author="Nick Stuart" runInTransaction="true">
+        <addColumn tableName="user">
+            <column name="password" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+</databaseChangeLog>

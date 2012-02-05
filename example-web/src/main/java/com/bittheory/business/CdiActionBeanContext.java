@@ -4,16 +4,14 @@
  */
 package com.bittheory.business;
 
-import com.bittheory.business.CurrentSessionUser;
-import com.bittheory.domain.User;
-import javax.enterprise.context.SessionScoped;
-import javax.inject.Inject;
+import javax.enterprise.context.RequestScoped;
 import net.sourceforge.stripes.action.ActionBeanContext;
 
 /**
  *
  * @author nick
  */
+@RequestScoped
 public class CdiActionBeanContext extends ActionBeanContext {
     
 }

@@ -5,40 +5,40 @@
 package com.bittheory.domain;
 
 import java.io.Serializable;
-import java.util.List;
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
+import java.util.Set;
+import javax.persistence.*;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 /**
  *
  * @author nick
  */
 @Entity
-@Table(name = "users")
-public class User implements Serializable {
+@Table(name = "user")
+public class User extends Base implements Serializable {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private int id;
     private String firstName;
     private String lastName;
-    
-    @OneToMany(mappedBy="user",cascade= CascadeType.ALL)
-    private List<Alias> aliases;
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
+    @NotNull
+    @Size(max = 50, min = 4)
+    @Column(length = 50)
+    private String userName;
+    @NotNull
+    @Column(length = 255, name="password")
+    private String hashedPassword;
+    @Transient
+    private String password;
+    @NotNull
+    @Column(length = 100)
+    private String email;
+    @ManyToMany()
+    @JoinTable(name = "users_tracker_roles",
+    joinColumns = {
+        @JoinColumn(name = "user_id")},
+    inverseJoinColumns = {
+        @JoinColumn(name = "tracker_role_id")})
+    private Set<Role> roles;
 
     public String getFirstName() {
         return firstName;
@@ -56,12 +56,43 @@ public class User implements Serializable {
         this.lastName = lastName;
     }
 
-    public List<Alias> getAliases() {
-        return aliases;
+    public String getEmail() {
+        return email;
     }
 
-    public void setAliases(List<Alias> aliases) {
-        this.aliases = aliases;
+    public void setEmail(String email) {
+        this.email = email;
     }
-    
+
+    public String getHashedPassword() {
+        return hashedPassword;
+    }
+
+    public void setHashedPassword(String hashedPassword) {
+        this.hashedPassword = hashedPassword;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    public Set<Role> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(Set<Role> roles) {
+        this.roles = roles;
+    }
 }

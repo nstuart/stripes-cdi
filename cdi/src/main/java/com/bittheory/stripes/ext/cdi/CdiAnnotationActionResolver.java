@@ -5,6 +5,7 @@
 package com.bittheory.stripes.ext.cdi;
 
 import java.lang.reflect.Method;
+import javax.enterprise.context.ApplicationScoped;
 import net.sourceforge.stripes.action.ActionBean;
 import net.sourceforge.stripes.action.ActionBeanContext;
 import net.sourceforge.stripes.controller.AnnotatedClassActionResolver;
@@ -21,6 +22,7 @@ import net.sourceforge.stripes.exception.StripesServletException;
  *
  * @author Nick Stuart
  */
+@ApplicationScoped
 public class CdiAnnotationActionResolver extends AnnotatedClassActionResolver {
 
     @Override
