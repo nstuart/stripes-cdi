@@ -19,12 +19,13 @@ import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.List;
 import javax.inject.Qualifier;
+import net.sourceforge.stripes.action.ActionBean;
 
 /**
  * Helps find any Qualifier annotations on a given class.
  * @author Nick Stuart
  */
-public class QualifierLookup {
+public class ClassUtils {
 
     public static Annotation[] getQualifiers(Class clazz) {
         List<Annotation> qualifierAnnnotations = new ArrayList<Annotation>();
@@ -35,5 +36,23 @@ public class QualifierLookup {
             }
         }
         return qualifierAnnnotations.toArray(new Annotation[]{});
+    }
+    
+    /**
+     * Currently a naive approach to getting the real class as it relies on the
+     * WeldClientProx to be a part of the classname. Obviously not portable or
+     * robust.
+     *
+     * @param bean
+     * @return
+     */
+    public static Class<? extends ActionBean> getRealBeanClass(Class<? extends ActionBean> bean) {
+        Class<? extends ActionBean> beanClass;
+        if (bean.getName().contains("$_WeldClientProx")) {
+            beanClass = (Class<? extends ActionBean>) bean.getSuperclass();
+        } else {
+            beanClass = bean;
+        }
+        return beanClass;
     }
 }

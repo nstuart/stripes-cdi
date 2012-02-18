@@ -15,6 +15,7 @@
  */
 package com.bittheory.stripes.ext.cdi;
 
+import com.bittheory.stripes.util.ClassUtils;
 import java.lang.reflect.Method;
 import javax.enterprise.context.ApplicationScoped;
 import net.sourceforge.stripes.action.ActionBean;
@@ -38,59 +39,42 @@ public class CdiAnnotationActionResolver extends AnnotatedClassActionResolver {
 
     @Override
     public Method getDefaultHandler(Class<? extends ActionBean> bean) throws StripesServletException {
-        return super.getDefaultHandler(getRealBeanClass(bean));
+        return super.getDefaultHandler(ClassUtils.getRealBeanClass(bean));
     }
 
     @Override
     public String getEventName(Class<? extends ActionBean> bean, ActionBeanContext context) {
-        return super.getEventName(getRealBeanClass(bean), context);
+        return super.getEventName(ClassUtils.getRealBeanClass(bean), context);
     }
 
     @Override
     protected String getEventNameFromPath(Class<? extends ActionBean> bean, ActionBeanContext context) {
-        return super.getEventNameFromPath(getRealBeanClass(bean), context);
+        return super.getEventNameFromPath(ClassUtils.getRealBeanClass(bean), context);
     }
 
     @Override
     protected String getEventNameFromEventNameParam(Class<? extends ActionBean> bean, ActionBeanContext context) {
-        return super.getEventNameFromEventNameParam(getRealBeanClass(bean), context);
+        return super.getEventNameFromEventNameParam(ClassUtils.getRealBeanClass(bean), context);
     }
 
     @Override
     protected String getEventNameFromRequestAttribute(Class<? extends ActionBean> bean, ActionBeanContext context) {
-        return super.getEventNameFromRequestAttribute(getRealBeanClass(bean), context);
+        return super.getEventNameFromRequestAttribute(ClassUtils.getRealBeanClass(bean), context);
     }
 
     @Override
     protected String getEventNameFromRequestParams(Class<? extends ActionBean> bean, ActionBeanContext context) {
-        return super.getEventNameFromRequestParams(getRealBeanClass(bean), context);
+        return super.getEventNameFromRequestParams(ClassUtils.getRealBeanClass(bean), context);
     }
 
     @Override
     public Method getHandler(Class<? extends ActionBean> bean, String eventName) throws StripesServletException {
-        return super.getHandler(getRealBeanClass(bean), eventName);
+        return super.getHandler(ClassUtils.getRealBeanClass(bean), eventName);
     }
 
     @Override
     public String getUrlBinding(Class<? extends ActionBean> clazz) {
-        return super.getUrlBinding(getRealBeanClass(clazz));
+        return super.getUrlBinding(ClassUtils.getRealBeanClass(clazz));
     }
-
-    /**
-     * Currently a naive approach to getting the real class as it relies on the
-     * WeldClientProx to be a part of the classname. Obviously not portable or
-     * robust.
-     *
-     * @param bean
-     * @return
-     */
-    private Class<? extends ActionBean> getRealBeanClass(Class<? extends ActionBean> bean) {
-        Class<? extends ActionBean> beanClass;
-        if (bean.getName().contains("$_WeldClientProx")) {
-            beanClass = (Class<? extends ActionBean>) bean.getSuperclass();
-        } else {
-            beanClass = bean;
-        }
-        return beanClass;
-    }
+    
 }

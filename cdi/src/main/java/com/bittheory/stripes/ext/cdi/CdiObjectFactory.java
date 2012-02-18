@@ -15,7 +15,7 @@
  */
 package com.bittheory.stripes.ext.cdi;
 
-import com.bittheory.stripes.util.QualifierLookup;
+import com.bittheory.stripes.util.ClassUtils;
 import java.lang.reflect.Constructor;
 import java.util.Set;
 import javax.annotation.Resource;
@@ -82,7 +82,7 @@ public class CdiObjectFactory implements ObjectFactory, ConfigurableComponent {
             //delegate to the default object factory for predefined interfaces.
             obj = defaultObjectFactory.newInstance(clazz);
         } else {
-            Set<Bean<?>> availableBeans = beanManager.getBeans(clazz, QualifierLookup.getQualifiers(clazz));
+            Set<Bean<?>> availableBeans = beanManager.getBeans(clazz, ClassUtils.getQualifiers(clazz));
             if (availableBeans.isEmpty()) {
                 log.debug("Could not find a valid bean for given type {}. "
                         + "Dropping to DefaultObjectFactory", clazz.getCanonicalName());
