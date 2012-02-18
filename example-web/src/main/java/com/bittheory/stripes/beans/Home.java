@@ -23,11 +23,13 @@ import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
+import net.sourceforge.stripes.action.Before;
 import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.HandlesEvent;
 import net.sourceforge.stripes.action.RedirectResolution;
 import net.sourceforge.stripes.action.UrlBinding;
+import net.sourceforge.stripes.controller.LifecycleStage;
 import net.sourceforge.stripes.validation.Validate;
 import net.sourceforge.stripes.validation.ValidateNestedProperties;
 import org.slf4j.Logger;
@@ -42,16 +44,13 @@ public class Home extends StripesActionBean {
 
     @Inject
     private CurrentSessionUser loginInfo;
-    
     @ValidateNestedProperties({
-        @Validate(field="userName", required=true, on="login")
+        @Validate(field = "userName", required = true, on = "login")
     })
     @Inject
     private LoginRequest loginRequest;
-    
     @Inject
     private Logger log;
-    
     @PersistenceContext
     private EntityManager em;
 
@@ -60,25 +59,29 @@ public class Home extends StripesActionBean {
     public ForwardResolution index() {
         return new ForwardResolution("/index.jsp");
     }
-    
-    @HandlesEvent("login")
-    public RedirectResolution login(){
 
-        try{
-        User user = em.createQuery("SELECT u FROM User u WHERE u.firstName = :firstName", User.class)
-                .setParameter("firstName", loginRequest.getUserName()).getSingleResult();
-        loginInfo.setUser(user);
+    @HandlesEvent("login")
+    public RedirectResolution login() {
+        try {
+            User user = em.createQuery("SELECT u FROM User u WHERE u.firstName = :firstName", User.class).
+                    setParameter("firstName", loginRequest.getUserName()).getSingleResult();
+            loginInfo.setUser(user);
             return new RedirectResolution(this.getClass());
         } catch (NoResultException ex) {
             return new RedirectResolution(this.getClass());
         }
     }
-    
+
     @HandlesEvent("logout")
-    public RedirectResolution logout(){
+    public RedirectResolution logout() {
         User user = new User();
         loginInfo.setUser(null);
         return new RedirectResolution(this.getClass());
+    }
+    
+    @Before(stages={LifecycleStage.BindingAndValidation})
+    public void before(){
+        log.info("CDI Before filter works!");
     }
 
     public CurrentSessionUser getLoginInfo() {
@@ -96,5 +99,4 @@ public class Home extends StripesActionBean {
     public LoginRequest getLoginRequest() {
         return loginRequest;
     }
-    
 }

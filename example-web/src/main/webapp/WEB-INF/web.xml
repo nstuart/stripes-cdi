@@ -25,7 +25,6 @@
             <param-name>Extension.Packages</param-name>
             <param-value>com.bittheory.stripes.ext</param-value>
         </init-param>
-
         <init-param>
             <param-name>Stripes.EncryptionKey</param-name>
             <param-value>Asda423jaZFD234ada#414%^lij!</param-value>

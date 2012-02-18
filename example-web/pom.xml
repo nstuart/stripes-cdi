@@ -86,14 +86,6 @@
             <version>5.1.18</version>
             <scope>provided</scope>
         </dependency>
-        
-<!--        <dependency>
-            <groupId>org.apache.felix</groupId>
-            <artifactId>org.apache.felix.main</artifactId>
-            <version>1.0.4</version>
-            <scope>provided</scope>
-            <classifier>source</classifier>
-        </dependency>-->
     </dependencies>
 
     <build>
