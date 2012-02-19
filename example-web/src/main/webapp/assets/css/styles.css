@@ -1,0 +1,16 @@
+/* 
+    Document   : styles
+    Created on : Feb 16, 2012, 10:03:48 PM
+    Author     : nick
+    Description:
+        Purpose of the stylesheet follows.
+*/
+
+.control-group input.error, .control-group label.error, div.error, li.error {
+    color: #b94a48;
+    border-color: #b94a48;
+}
+
+div.error {
+    font-weight: bold;
+}

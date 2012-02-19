@@ -13,41 +13,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.bittheory.business;
+package com.bittheory.stripes.util;
 
-import com.bittheory.business.qualifiers.CurrentUser;
-import com.bittheory.domain.User;
-import java.io.Serializable;
-import javax.enterprise.context.SessionScoped;
 import javax.enterprise.inject.Produces;
+import javax.enterprise.inject.spi.InjectionPoint;
 import javax.inject.Named;
 
 /**
  *
  * @author nick
  */
-@SessionScoped
-public class CurrentSessionUser implements Serializable{
-    
-    private User user;
+public class PageNameGenerator {
+
+    private static String PAGE_LOCATION = "/WEB-INF/pages/";
 
     @Produces
-    @Named("currentUser")
-    @CurrentUser
-    public User getUser() {
-        return user;
+    @Named("defaultLayout")
+    public String defaultLayout() {
+        return PAGE_LOCATION + "layout/default.jsp";
     }
 
-    public void setUser(User user) {
-        this.user = user;
-    }
-    
-    public String getUserName(){
-        if(user != null){
-            return user.getUserName();
-        }else{
-            return null;
+    @Produces
+    @PagePath
+    private String pageName(InjectionPoint injectionPoint) {
+        PagePath p = injectionPoint.getAnnotated().getAnnotation(PagePath.class);
+        
+        if (p.value() == null || p.value().equals("")) {
+            throw new IllegalArgumentException("@Page must have a value set!");
+        } else {
+            return PAGE_LOCATION + p.value();
         }
     }
-    
 }

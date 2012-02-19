@@ -23,7 +23,7 @@ import javax.validation.constraints.Size;
 
 /**
  *
- * @author nick
+ * @author Nick Stuart
  */
 @Entity
 @Table(name = "user")
@@ -40,6 +40,8 @@ public class User extends Base implements Serializable {
     private String hashedPassword;
     @Transient
     private String password;
+    @Transient
+    private String passwordConfirmation;
     @NotNull
     @Column(length = 100)
     private String email;
@@ -89,6 +91,14 @@ public class User extends Base implements Serializable {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getPasswordConfirmation() {
+        return passwordConfirmation;
+    }
+
+    public void setPasswordConfirmation(String passwordConfirmation) {
+        this.passwordConfirmation = passwordConfirmation;
     }
 
     public String getUserName() {

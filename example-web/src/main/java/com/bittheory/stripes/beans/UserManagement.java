@@ -16,70 +16,100 @@
 package com.bittheory.stripes.beans;
 
 import com.bittheory.business.UserService;
-import com.bittheory.business.qualifiers.DomainObject;
 import com.bittheory.business.qualifiers.Action;
 import com.bittheory.domain.User;
+import com.bittheory.stripes.util.PagePath;
 import com.bittheory.stripes.util.TransactionRequired;
+import com.google.common.base.Strings;
 import javax.inject.Inject;
-import net.sourceforge.stripes.action.After;
-import net.sourceforge.stripes.action.Before;
-import net.sourceforge.stripes.action.DefaultHandler;
-import net.sourceforge.stripes.action.ForwardResolution;
-import net.sourceforge.stripes.action.HandlesEvent;
-import net.sourceforge.stripes.action.RedirectResolution;
-import net.sourceforge.stripes.action.UrlBinding;
+import net.sourceforge.stripes.action.*;
 import net.sourceforge.stripes.controller.LifecycleStage;
+import net.sourceforge.stripes.validation.*;
 
 /**
  *
  * @author nick
  */
 @Action
-@UrlBinding("/admin/users/{$event}/{id}")
+@UrlBinding("/admin/users/{$event}/{user}")
 public class UserManagement extends StripesActionBean {
 
     @Inject
     private UserService userService;
     @Inject
-    @DomainObject()
+    @PagePath("users/view.jsp")
+    private String view;
+    @Inject
+    @PagePath("users/edit.jsp")
+    private String edit;
+    @Inject
+    @PagePath("users/create.jsp")
+    private String create;
+    
+    @ValidateNestedProperties({
+        @Validate(field="id", ignore=true),
+        @Validate(field="userName", required=true, on={"update", "create"}),
+        @Validate(field="firstName", required=true, on={"update", "create"}),
+        @Validate(field="lastName", required=true, on={"update", "create"}),
+        @Validate(field="email", required=true, on={"update", "create"}),
+        @Validate(field="password", required=true, on={"create"}),
+        @Validate(field="passwordConfirmation", required=true, on={"create"})
+    })
     private User user;
 
     @DefaultHandler
     public ForwardResolution index() {
+        return new ForwardResolution(view);
+    }
 
-        return new ForwardResolution("");
+    @HandlesEvent("view")
+    public ForwardResolution view() {
+        return new ForwardResolution(view);
     }
 
     @HandlesEvent("new")
     public ForwardResolution newUser() {
-        return new ForwardResolution("/create_user.jsp");
+        return new ForwardResolution(create);
     }
 
     @HandlesEvent("edit")
     public ForwardResolution edit() {
-        return new ForwardResolution("/edit_user.jsp");
+        return new ForwardResolution(edit);
     }
+    
+    @HandlesEvent("cancel")
+    public RedirectResolution cancel(){
+        return new RedirectResolution(this.getClass(), "index");
+    }
+    
 
     @TransactionRequired
     @HandlesEvent("update")
     public RedirectResolution update() {
-        setPassword();
         userService.update();
-        return new RedirectResolution(this.getClass(), "edit").addParameter("id", user.getId());
+        return new RedirectResolution(this.getClass(), "view").addParameter("user", user.getId());
     }
 
     @HandlesEvent("create")
     public RedirectResolution create() {
-        setPassword();
         userService.createUser(user);
-
         RedirectResolution rd = new RedirectResolution(this.getClass(), "edit");
-        rd.addParameter("id", user.getId());
+        rd.addParameter("user", user.getId());
         return rd;
     }
+    
+    @ValidationMethod(on={"create", "update"})
+    public void checkPassword(ValidationErrors errors){
+        if(user.getPassword() != null){
+            if(!user.getPassword().equals(user.getPasswordConfirmation())){
+                errors.add("user.password", new LocalizableError("validation.password.mismatch"));
+            }
+        }
+    }
 
+    @After(on = {"create", "update"}, stages = LifecycleStage.CustomValidation)
     public void setPassword() {
-        if (user.getPassword() != null) {
+        if (user != null && !Strings.isNullOrEmpty(user.getPassword())) {
             user.setHashedPassword(user.getPassword());
         }
     }

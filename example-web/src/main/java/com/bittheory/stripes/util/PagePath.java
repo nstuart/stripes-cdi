@@ -13,16 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.bittheory.business;
+package com.bittheory.stripes.util;
 
-import javax.enterprise.context.RequestScoped;
-import net.sourceforge.stripes.action.ActionBeanContext;
+import static java.lang.annotation.ElementType.TYPE;
+import static java.lang.annotation.ElementType.FIELD;
+import static java.lang.annotation.ElementType.PARAMETER;
+import static java.lang.annotation.ElementType.METHOD;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
+import javax.enterprise.util.Nonbinding;
+import javax.inject.Qualifier;
 
 /**
  *
  * @author nick
  */
-@RequestScoped
-public class CdiActionBeanContext extends ActionBeanContext {
-    
+@Qualifier
+@Retention(RUNTIME)
+@Target({METHOD, FIELD, PARAMETER, TYPE})
+public @interface PagePath {
+    @Nonbinding String value() default "";
 }

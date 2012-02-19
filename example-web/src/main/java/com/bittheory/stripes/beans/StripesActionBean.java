@@ -15,6 +15,10 @@
  */
 package com.bittheory.stripes.beans;
 
+import com.bittheory.business.CurrentSessionUser;
+import com.bittheory.stripes.ext.CdiActionBeanContext;
+import com.bittheory.stripes.model.LoginRequest;
+import javax.inject.Inject;
 import net.sourceforge.stripes.action.ActionBean;
 import net.sourceforge.stripes.action.ActionBeanContext;
 
@@ -24,11 +28,21 @@ import net.sourceforge.stripes.action.ActionBeanContext;
  */
 public class StripesActionBean implements ActionBean{
 
-    protected ActionBeanContext context;
+    protected CdiActionBeanContext context;
+    @Inject
+    protected CurrentSessionUser currentSessionUser;
+
+    public CurrentSessionUser getCurrentSessionUser() {
+        return currentSessionUser;
+    }
+
+    public void setCurrentSessionUser(CurrentSessionUser currentSessionUser) {
+        this.currentSessionUser = currentSessionUser;
+    }
     
     @Override
     public void setContext(ActionBeanContext context) {
-        this.context = context;
+        this.context = (CdiActionBeanContext) context;
     }
 
     @Override

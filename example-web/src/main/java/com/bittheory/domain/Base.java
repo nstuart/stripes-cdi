@@ -38,7 +38,7 @@ public class Base implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private long id;
     @NotNull
     @Column(insertable = true, updatable = false)
     @Temporal(TemporalType.TIMESTAMP)
@@ -47,11 +47,11 @@ public class Base implements Serializable {
     @Temporal(TemporalType.TIMESTAMP)
     private Date updatedAt;
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(long id) {
         this.id = id;
     }
 

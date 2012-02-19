@@ -1,10 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
-<web-app xmlns="http://java.sun.com/xml/ns/javaee"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
-         version="3.0">
-             
+<web-app version="3.0" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd">
     <filter>
         <description>
             Provides essential configuration and request processing services
@@ -13,46 +8,53 @@
         <display-name>Stripes Filter</display-name>
         <filter-name>StripesFilter</filter-name>
         <filter-class>net.sourceforge.stripes.controller.StripesFilter</filter-class>
-
         <!-- REQUIRED init parameter for the Stripes Filter. -->
         <init-param>
             <param-name>ActionResolver.Packages</param-name>
             <param-value>com.bittheory.stripes.beans</param-value>
         </init-param>
-
         <!-- Optional init parameter for the Stripes Filter. -->
         <init-param>
             <param-name>Extension.Packages</param-name>
-            <param-value>com.bittheory.stripes.ext</param-value>
+            <param-value>
+                com.bittheory.stripes.ext
+            </param-value>
         </init-param>
         <init-param>
             <param-name>Stripes.EncryptionKey</param-name>
             <param-value>Asda423jaZFD234ada#414%^lij!</param-value>
         </init-param>
     </filter>
-    
     <filter>
         <filter-name>txFilter</filter-name>
         <filter-class>com.bittheory.stripes.TransactionalFilter</filter-class>
     </filter>
-
+    <filter>
+        <filter-name>context-setter</filter-name>
+        <filter-class>com.bittheory.web.ContextSetterFilter</filter-class>
+    </filter>
     <filter-mapping>
         <filter-name>StripesFilter</filter-name>
         <url-pattern>*.jsp</url-pattern>
         <dispatcher>REQUEST</dispatcher>
     </filter-mapping>
-    
     <filter-mapping>
         <filter-name>txFilter</filter-name>
         <url-pattern>/*</url-pattern>
         <dispatcher>REQUEST</dispatcher>
     </filter-mapping>
-
     <filter>
         <filter-name>DMF</filter-name>
         <filter-class>net.sourceforge.stripes.controller.DynamicMappingFilter</filter-class>
     </filter>
-
+    <filter-mapping>
+        <filter-name>context-setter</filter-name>
+        <url-pattern>/*</url-pattern>
+        <dispatcher>REQUEST</dispatcher>
+        <dispatcher>FORWARD</dispatcher>
+        <dispatcher>INCLUDE</dispatcher>
+        <dispatcher>ERROR</dispatcher>
+    </filter-mapping>
     <filter-mapping>
         <filter-name>DMF</filter-name>
         <url-pattern>/*</url-pattern>
@@ -61,6 +63,7 @@
         <dispatcher>INCLUDE</dispatcher>
         <dispatcher>ERROR</dispatcher>
     </filter-mapping>
+    
     <session-config>
         <session-timeout>
             30

@@ -1,6 +1,6 @@
 /example-web/target/
 /cdi/target/
 glassfish-resources.xml
-
+.DS_Store
 target
 
