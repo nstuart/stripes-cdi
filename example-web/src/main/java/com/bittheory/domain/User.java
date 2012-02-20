@@ -16,6 +16,7 @@
 package com.bittheory.domain;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.Set;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -27,17 +28,29 @@ import javax.validation.constraints.Size;
  */
 @Entity
 @Table(name = "user")
+@NamedQueries({
+    @NamedQuery(name = User.QRY_LOGIN_INFO, query = "SELECT u.hashedPassword, u.salt "
+    + "FROM User u "
+    + "WHERE u.userName = :userName"),
+    @NamedQuery(name = User.QRY_BY_USER_NAME, query = "SELECT u "
+    + "FROM User u "
+    + "WHERE u.userName = :userName")
+})
 public class User extends Base implements Serializable {
 
+    public static final String QRY_LOGIN_INFO = "User.loginInfo";
+    public static final String QRY_BY_USER_NAME = "User.byUserName";
     private String firstName;
     private String lastName;
     @NotNull
     @Size(max = 50, min = 4)
-    @Column(length = 50)
+    @Column(length = 50, unique=true)
     private String userName;
     @NotNull
-    @Column(length = 255, name="password")
+    @Column(length = 255, name = "password")
     private String hashedPassword;
+    @NotNull
+    private String salt;
     @Transient
     private String password;
     @Transient
@@ -52,6 +65,9 @@ public class User extends Base implements Serializable {
     inverseJoinColumns = {
         @JoinColumn(name = "tracker_role_id")})
     private Set<Role> roles;
+    
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date lastLogin;
 
     public String getFirstName() {
         return firstName;
@@ -107,6 +123,22 @@ public class User extends Base implements Serializable {
 
     public void setUserName(String userName) {
         this.userName = userName;
+    }
+
+    public String getSalt() {
+        return salt;
+    }
+
+    public void setSalt(String salt) {
+        this.salt = salt;
+    }
+
+    public Date getLastLogin() {
+        return lastLogin;
+    }
+
+    public void setLastLogin(Date lastLogin) {
+        this.lastLogin = lastLogin;
     }
 
     public Set<Role> getRoles() {

@@ -11,7 +11,7 @@
             <stripes:form beanclass="${userManagement.class}">
                 <div class="span3">
                     <jsp:include page="_user_form.jsp"/>
-                    <stripes:submit name="update" value="Update" class="btn-primary"/>
+                    <stripes:submit name="update" value="Update" class="btn btn-primary"/>
                     <stripes:submit name="cancel" value="Cancel" class="btn"/>
                 </div>
                 <div class="span3">

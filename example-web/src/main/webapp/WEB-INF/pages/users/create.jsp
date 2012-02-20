@@ -7,7 +7,8 @@
             <stripes:form beanclass="${userManagement.class}">
                 <div class="span3">
                     <jsp:include page="_user_form.jsp"/>
-                    <stripes:submit name="create"/>
+                    <stripes:submit name="create" class="btn btn-primary"/>
+                    <stripes:submit name="cancel" class="btn" value="Cancel"/>
                 </div>
                 <div class="span3">
                     <stripes:errors/>

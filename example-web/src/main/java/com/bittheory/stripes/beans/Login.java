@@ -4,12 +4,16 @@
  */
 package com.bittheory.stripes.beans;
 
+import com.bittheory.stripes.util.LoginSuccess;
 import com.bittheory.business.CurrentSessionUser;
+import com.bittheory.business.UserService;
 import com.bittheory.business.qualifiers.Action;
 import com.bittheory.domain.User;
 import com.bittheory.stripes.util.PagePath;
 import com.bittheory.stripes.model.LoginRequest;
+import com.bittheory.stripes.util.LoginFailure;
 import com.google.common.base.Strings;
+import javax.enterprise.event.Event;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -36,11 +40,18 @@ public class Login extends StripesActionBean {
     private LoginRequest loginRequest;
     @Inject
     private Logger log;
-    @PersistenceContext
-    private EntityManager em;
+    @Inject
+    private UserService userService;
     @Inject
     @PagePath(value = "login/index.jsp")
     private String index;
+    
+    @Inject
+    @LoginSuccess
+    private Event<User> loginSuccess;
+    @Inject
+    @LoginFailure
+    private Event<LoginRequest> loginFailure;
 
     @DefaultHandler
     public Resolution index() {
@@ -49,21 +60,25 @@ public class Login extends StripesActionBean {
 
     @HandlesEvent("login")
     public Resolution login() {
-        try {
-            log.debug("Attempting to login user {}", loginRequest.getUserName());
-            User user = em.createQuery("SELECT u FROM User u WHERE u.firstName = :firstName", User.class).
-                    setParameter("firstName", loginRequest.getUserName()).getSingleResult();
-            currentSessionUser.setUser(user);
+        log.debug("Attempting to login user {}", loginRequest.getUserName());
+        Resolution res;
+        if (userService.validPassword(loginRequest.getUserName(), loginRequest.getPassword())) {
+            currentSessionUser.setUser(
+                    userService.loadByUserName(loginRequest.getUserName()));
             String rdFrom = context.getRedirectedFrom();
             if (Strings.isNullOrEmpty(rdFrom)) {
-                return new RedirectResolution(Home.class);
+                res = new RedirectResolution(Home.class);
             } else {
-                return new RedirectResolution(rdFrom, false);
+                res = new RedirectResolution(rdFrom, false);
             }
-        } catch (NoResultException ex) {
+            loginSuccess.fire(currentSessionUser.getUser());
+        } else {
+            loginFailure.fire(loginRequest);
             context.getValidationErrors().addGlobalError(new SimpleError("Invalid user information."));
-            return new RedirectResolution(this.getClass());
+            loginRequest.clear();
+            res = new ForwardResolution(this.getClass());
         }
+        return res;
     }
 
     public LoginRequest getLoginRequest() {

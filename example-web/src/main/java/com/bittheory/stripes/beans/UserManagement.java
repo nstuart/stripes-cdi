@@ -20,10 +20,12 @@ import com.bittheory.business.qualifiers.Action;
 import com.bittheory.domain.User;
 import com.bittheory.stripes.util.PagePath;
 import com.bittheory.stripes.util.TransactionRequired;
-import com.google.common.base.Strings;
+import java.util.List;
 import javax.inject.Inject;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import net.sourceforge.stripes.action.*;
-import net.sourceforge.stripes.controller.LifecycleStage;
+import net.sourceforge.stripes.controller.FlashScope;
 import net.sourceforge.stripes.validation.*;
 
 /**
@@ -36,6 +38,8 @@ public class UserManagement extends StripesActionBean {
 
     @Inject
     private UserService userService;
+    @PersistenceContext
+    private EntityManager em;
     @Inject
     @PagePath("users/view.jsp")
     private String view;
@@ -45,10 +49,13 @@ public class UserManagement extends StripesActionBean {
     @Inject
     @PagePath("users/create.jsp")
     private String create;
+    @Inject
+    @PagePath("users/index.jsp")
+    private String index;
     
     @ValidateNestedProperties({
         @Validate(field="id", ignore=true),
-        @Validate(field="userName", required=true, on={"update", "create"}),
+        @Validate(field="userName", required=true, minlength=4, maxlength=50, on={"update", "create"}),
         @Validate(field="firstName", required=true, on={"update", "create"}),
         @Validate(field="lastName", required=true, on={"update", "create"}),
         @Validate(field="email", required=true, on={"update", "create"}),
@@ -56,10 +63,15 @@ public class UserManagement extends StripesActionBean {
         @Validate(field="passwordConfirmation", required=true, on={"create"})
     })
     private User user;
+    
+    private List<User> users;
 
     @DefaultHandler
     public ForwardResolution index() {
-        return new ForwardResolution(view);
+        users = em.
+                createQuery("SELECT u FROM User u ORDER BY u.userName", User.class).
+                getResultList();
+        return new ForwardResolution(index);
     }
 
     @HandlesEvent("view")
@@ -81,20 +93,20 @@ public class UserManagement extends StripesActionBean {
     public RedirectResolution cancel(){
         return new RedirectResolution(this.getClass(), "index");
     }
-    
 
     @TransactionRequired
     @HandlesEvent("update")
     public RedirectResolution update() {
-        userService.update();
-        return new RedirectResolution(this.getClass(), "view").addParameter("user", user.getId());
+        userService.update(user);
+        FlashScope.getCurrent(context.getRequest(), true).put("message", "User information has been updated!");
+        return new RedirectResolution(this.getClass());
     }
 
     @HandlesEvent("create")
     public RedirectResolution create() {
         userService.createUser(user);
-        RedirectResolution rd = new RedirectResolution(this.getClass(), "edit");
-        rd.addParameter("user", user.getId());
+        RedirectResolution rd = new RedirectResolution(this.getClass());
+        FlashScope.getCurrent(context.getRequest(), true).put("message", "User created successfully!");
         return rd;
     }
     
@@ -107,18 +119,15 @@ public class UserManagement extends StripesActionBean {
         }
     }
 
-    @After(on = {"create", "update"}, stages = LifecycleStage.CustomValidation)
-    public void setPassword() {
-        if (user != null && !Strings.isNullOrEmpty(user.getPassword())) {
-            user.setHashedPassword(user.getPassword());
-        }
-    }
-
     public User getUser() {
         return user;
     }
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public List<User> getUsers() {
+        return users;
     }
 }

@@ -128,4 +128,20 @@ Copyright 2012 Nick Stuart
             </column>
         </addColumn>
     </changeSet>
+    
+    <changeSet id="7" author="Nick Stuart" runInTransaction="true">
+        <addColumn tableName="user">
+            <column name="salt" type="varchar(255)" defaultValue="salt">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    
+    <changeSet id="8" author="Nick Stuart" runInTransaction="true">
+        <addColumn tableName="user">
+            <column name="lastLogin" type="DATETIME">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
 </databaseChangeLog>

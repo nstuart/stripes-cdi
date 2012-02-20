@@ -37,7 +37,7 @@ public class DomainDao<T extends Base> {
         entityManager.persist(object);
     }
     
-    public T load(Class<T> type, int id){
+    public T load(Class<T> type, long id){
         return entityManager.find(type, id);
     }
     
